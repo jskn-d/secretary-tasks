@@ -5,19 +5,19 @@ class FloatingPanel: NSPanel {
     init(contentRect: NSRect) {
         super.init(
             contentRect: contentRect,
-            styleMask: [.nonactivatingPanel, .titled, .closable, .fullSizeContentView, .hudWindow],
+            styleMask: [.nonactivatingPanel, .fullSizeContentView, .borderless],
             backing: .buffered,
             defer: false
         )
 
         level = .floating
         isMovableByWindowBackground = true
-        titlebarAppearsTransparent = true
-        titleVisibility = .hidden
+        hasShadow = true
         hidesOnDeactivate = false
         isOpaque = false
         backgroundColor = .clear
         collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
+        appearance = NSAppearance(named: .darkAqua)
 
         // Restore saved position
         if let x = UserDefaults.standard.object(forKey: "windowOriginX") as? CGFloat,

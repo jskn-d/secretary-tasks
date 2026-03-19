@@ -6,13 +6,43 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     private var panel: FloatingPanel?
     private let viewModel = TodoViewModel()
+    private var globalMonitor: Any?
+    private var localMonitor: Any?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
+
+        AXIsProcessTrustedWithOptions(
+            [kAXTrustedCheckOptionPrompt.takeUnretainedValue(): true] as CFDictionary
+        )
+
         setupPanel()
+        registerHotKey()
         viewModel.loadTodo()
         viewModel.startWatching()
         viewModel.startDateRolloverTimer()
+    }
+
+    private func registerHotKey() {
+        globalMonitor = NSEvent.addGlobalMonitorForEvents(matching: .keyDown) { [weak self] event in
+            if Self.isHotKey(event) {
+                DispatchQueue.main.async { self?.togglePanel() }
+            }
+        }
+
+        localMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
+            if Self.isHotKey(event) {
+                DispatchQueue.main.async { self?.togglePanel() }
+                return nil
+            }
+            return event
+        }
+    }
+
+    private static func isHotKey(_ event: NSEvent) -> Bool {
+        guard event.keyCode == 1 else { return false }
+        let mods = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
+        return mods.contains(.control) && mods.contains(.option)
     }
 
     private func setupPanel() {

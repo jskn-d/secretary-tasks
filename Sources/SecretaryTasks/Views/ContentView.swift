@@ -29,7 +29,7 @@ struct ContentView: View {
                 .transition(.move(edge: .trailing))
             }
         }
-        .background(Color.black.opacity(0.85))
+        .background(VisualEffectView(material: .hudWindow, blendingMode: .behindWindow))
         .onChange(of: viewModel.selectedTask?.id) { _ in
             let expanded = viewModel.selectedTask?.linkedFilePath != nil && viewModel.dispatchContentRaw != nil
             notifyPanelResize(expanded: expanded)

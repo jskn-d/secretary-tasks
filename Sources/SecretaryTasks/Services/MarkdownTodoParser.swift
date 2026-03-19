@@ -90,6 +90,16 @@ struct MarkdownTodoParser {
         }
     }
 
+    /// Extract file path ending with .md from a value that may contain trailing text (e.g. "knowledge/foo.md Step 1")
+    private func extractFilePath(from value: String) -> String? {
+        let trimmed = value.trimmingCharacters(in: .whitespaces)
+        // Find the .md extension and take everything up to it (drop trailing text like " Step 1")
+        if let range = trimmed.range(of: ".md") {
+            return String(trimmed[trimmed.startIndex..<range.upperBound])
+        }
+        return trimmed.isEmpty ? nil : trimmed
+    }
+
     private func parseTaskLine(line: String, lineIndex: Int) -> TaskItem? {
         let isCompleted: Bool
         let content: String
@@ -123,11 +133,9 @@ struct MarkdownTodoParser {
         for segment in segments.dropFirst() {
             let trimmedSegment = segment.trimmingCharacters(in: .whitespaces)
             if trimmedSegment.hasPrefix("ディスパッチ: ") {
-                linkedFilePath = String(trimmedSegment.dropFirst("ディスパッチ: ".count))
-                    .trimmingCharacters(in: .whitespaces)
+                linkedFilePath = extractFilePath(from: String(trimmedSegment.dropFirst("ディスパッチ: ".count)))
             } else if trimmedSegment.hasPrefix("手順: ") {
-                linkedFilePath = String(trimmedSegment.dropFirst("手順: ".count))
-                    .trimmingCharacters(in: .whitespaces)
+                linkedFilePath = extractFilePath(from: String(trimmedSegment.dropFirst("手順: ".count)))
             }
         }
 
