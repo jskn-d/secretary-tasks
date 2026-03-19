@@ -2,9 +2,13 @@ import SwiftUI
 
 @main
 struct SecretaryTasksApp: App {
+    @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+
     var body: some Scene {
         MenuBarExtra("Secretary Tasks", systemImage: "checklist") {
-            ContentView()
+            Button("Show/Hide") { appDelegate.togglePanel() }
+            Divider()
+            Button("Quit") { NSApp.terminate(nil) }
         }
     }
 }

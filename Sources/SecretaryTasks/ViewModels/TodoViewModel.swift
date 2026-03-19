@@ -5,17 +5,20 @@ import SwiftUI
 class TodoViewModel: ObservableObject {
     @Published var dailyTodo: DailyTodo?
     @Published var selectedTask: TaskItem?
-    @Published var dispatchContent: AttributedString?
+    @Published var dispatchContentRaw: String?
 
     private let parser = MarkdownTodoParser()
     private let writer = MarkdownTodoWriter()
     private var fileWatcher: FileWatcher?
     private var isSelfTriggeredWrite = false
+    private var dateRolloverTimer: Timer?
+    private var currentDateString: String = ""
 
     func loadTodo() {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
         let todayString = dateFormatter.string(from: Date())
+        currentDateString = todayString
 
         let filePath = Configuration.todosDirectory + "/" + todayString + ".md"
 
@@ -60,17 +63,33 @@ class TodoViewModel: ObservableObject {
         selectedTask = task
 
         guard let linkedPath = task.linkedFilePath else {
-            dispatchContent = nil
+            dispatchContentRaw = nil
             return
         }
 
         let fullPath = Configuration.secretaryBaseDirectory + "/" + linkedPath
 
         guard let content = try? String(contentsOfFile: fullPath, encoding: .utf8) else {
-            dispatchContent = nil
+            dispatchContentRaw = nil
             return
         }
 
-        dispatchContent = try? AttributedString(markdown: content)
+        dispatchContentRaw = content
+    }
+
+    func startDateRolloverTimer() {
+        dateRolloverTimer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in
+            Task { @MainActor [weak self] in
+                guard let self = self else { return }
+                let dateFormatter = DateFormatter()
+                dateFormatter.dateFormat = "yyyy-MM-dd"
+                let now = dateFormatter.string(from: Date())
+                if now != self.currentDateString {
+                    self.selectedTask = nil
+                    self.dispatchContentRaw = nil
+                    self.loadTodo()
+                }
+            }
+        }
     }
 }
