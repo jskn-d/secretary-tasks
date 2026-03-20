@@ -76,6 +76,20 @@ Todo ファイルは `<secretaryBaseDirectory>/todos/` に日付名（`YYYY-MM-D
 - `- [x] タスク` — 完了タスク
 - `→ path/to/file.md` — ディスパッチファイルへのリンク（選択時にサイドパネルに表示）。パスは `secretaryBaseDirectory` からの相対パス。
 
+## ホットキーの変更
+
+デフォルトのホットキーは `⌃⌥S`（Control + Option + S）です。変更するには `Sources/SecretaryTasks/App/AppDelegate.swift` の `isHotKey` メソッドを編集してください:
+
+```swift
+private static func isHotKey(_ event: NSEvent) -> Bool {
+    guard event.keyCode == 1 else { return false }  // 1 = "S" キー
+    let mods = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
+    return mods.contains(.control) && mods.contains(.option)
+}
+```
+
+`keyCode` を任意のキーに変更し（例: `0` = A, `1` = S, `2` = D）、修飾キー（`.command`, `.control`, `.option`, `.shift`）を調整した後、`./install.sh` で再ビルドしてください。
+
 ## ライセンス
 
 [MIT](LICENSE)

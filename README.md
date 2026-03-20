@@ -74,6 +74,20 @@ Todo files are Markdown files stored in `<secretaryBaseDirectory>/todos/` and na
 - `- [x] Task` — completed task
 - `→ path/to/file.md` — links a dispatch file (shown in the side panel when selected). The path is relative to `secretaryBaseDirectory`.
 
+## Customizing the Hotkey
+
+The default hotkey is `⌃⌥S` (Control + Option + S). To change it, edit the `isHotKey` method in `Sources/SecretaryTasks/App/AppDelegate.swift`:
+
+```swift
+private static func isHotKey(_ event: NSEvent) -> Bool {
+    guard event.keyCode == 1 else { return false }  // 1 = "S" key
+    let mods = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
+    return mods.contains(.control) && mods.contains(.option)
+}
+```
+
+Change `keyCode` to the desired key (e.g. `0` = A, `1` = S, `2` = D) and adjust the modifier flags (`.command`, `.control`, `.option`, `.shift`). Then rebuild with `./install.sh`.
+
 ## License
 
 [MIT](LICENSE)
