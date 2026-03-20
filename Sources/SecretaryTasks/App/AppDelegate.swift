@@ -1,4 +1,5 @@
 import AppKit
+import Combine
 import SwiftUI
 
 @MainActor
@@ -8,6 +9,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     private let viewModel = TodoViewModel()
     private var globalMonitor: Any?
     private var localMonitor: Any?
+    private var settingsWindow: NSWindow?
+    private var configObserver: Any?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.setActivationPolicy(.accessory)
@@ -21,6 +24,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         viewModel.loadTodo()
         viewModel.startWatching()
         viewModel.startDateRolloverTimer()
+
+        configObserver = Configuration.shared.$secretaryBaseDirectory.sink { [weak self] _ in
+            Task { @MainActor in
+                self?.viewModel.reloadAfterConfigChange()
+            }
+        }
     }
 
     private func registerHotKey() {
@@ -69,6 +78,29 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         } else {
             panel.orderFront(nil)
         }
+    }
+
+    func openSettings() {
+        if let w = settingsWindow, w.isVisible {
+            w.makeKeyAndOrderFront(nil)
+            NSApp.activate(ignoringOtherApps: true)
+            return
+        }
+
+        let settingsView = SettingsView(configuration: Configuration.shared)
+        let window = NSWindow(
+            contentRect: NSRect(x: 0, y: 0, width: 420, height: 160),
+            styleMask: [.titled, .closable],
+            backing: .buffered,
+            defer: false
+        )
+        window.title = "Secretary Tasks Settings"
+        window.contentView = NSHostingView(rootView: settingsView)
+        window.center()
+        window.isReleasedWhenClosed = false
+        window.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
+        settingsWindow = window
     }
 
     func resizePanel(width: CGFloat) {
