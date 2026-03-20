@@ -13,7 +13,10 @@ let package = Package(
     targets: [
         .executableTarget(
             name: "SecretaryTasks",
-            path: "Sources/SecretaryTasks"
+            path: "Sources/SecretaryTasks",
+            resources: [
+                .process("Resources")
+            ]
         )
     ]
 )

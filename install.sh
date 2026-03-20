@@ -14,6 +14,9 @@ mkdir -p "${CONTENTS_DIR}/MacOS" "${CONTENTS_DIR}/Resources"
 cp .build/release/${APP_NAME} "${CONTENTS_DIR}/MacOS/${APP_NAME}"
 chmod +x "${CONTENTS_DIR}/MacOS/${APP_NAME}"
 
+# App icon
+cp Sources/SecretaryTasks/Resources/AppIcon.icns "${CONTENTS_DIR}/Resources/AppIcon.icns" 2>/dev/null || true
+
 # Info.plist (only if not exists or force update)
 cat > "${CONTENTS_DIR}/Info.plist" << 'PLIST'
 <?xml version="1.0" encoding="UTF-8"?>
@@ -38,6 +41,8 @@ cat > "${CONTENTS_DIR}/Info.plist" << 'PLIST'
     <string>13.0</string>
     <key>LSUIElement</key>
     <true/>
+    <key>CFBundleIconFile</key>
+    <string>AppIcon</string>
     <key>NSHighResolutionCapable</key>
     <true/>
 </dict>
