@@ -20,7 +20,7 @@ class TodoViewModel: ObservableObject {
         let todayString = dateFormatter.string(from: Date())
         currentDateString = todayString
 
-        let filePath = Configuration.todosDirectory + "/" + todayString + ".md"
+        let filePath = Configuration.shared.todosDirectory + "/" + todayString + ".md"
 
         guard FileManager.default.fileExists(atPath: filePath) else {
             dailyTodo = nil
@@ -47,7 +47,7 @@ class TodoViewModel: ObservableObject {
     }
 
     func startWatching() {
-        fileWatcher = FileWatcher(directoryPath: Configuration.todosDirectory) { [weak self] in
+        fileWatcher = FileWatcher(directoryPath: Configuration.shared.todosDirectory) { [weak self] in
             Task { @MainActor [weak self] in
                 guard let self = self else { return }
                 if self.isSelfTriggeredWrite {
@@ -67,7 +67,7 @@ class TodoViewModel: ObservableObject {
             return
         }
 
-        let fullPath = Configuration.secretaryBaseDirectory + "/" + linkedPath
+        let fullPath = Configuration.shared.secretaryBaseDirectory + "/" + linkedPath
 
         guard let content = try? String(contentsOfFile: fullPath, encoding: .utf8) else {
             dispatchContentRaw = nil
