@@ -1,5 +1,7 @@
 # Secretary Tasks
 
+[日本語](README.ja.md)
+
 A lightweight macOS floating panel app that displays your daily todo list. It watches Markdown-based todo files and updates in real time.
 
 ## Features
@@ -20,7 +22,7 @@ A lightweight macOS floating panel app that displays your daily todo list. It wa
 ## Installation
 
 ```bash
-git clone https://github.com/rootstack/secretary-tasks.git
+git clone https://github.com/jskn-d/secretary-tasks.git
 cd secretary-tasks
 ./install.sh
 ```
