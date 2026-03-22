@@ -26,6 +26,8 @@ class FloatingPanel: NSPanel {
         }
     }
 
+    override var canBecomeKey: Bool { true }
+
     override func setFrame(_ frameRect: NSRect, display displayFlag: Bool, animate animateFlag: Bool) {
         super.setFrame(frameRect, display: displayFlag, animate: animateFlag)
         savePosition()
